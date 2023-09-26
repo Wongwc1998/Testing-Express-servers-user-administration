@@ -8,13 +8,12 @@ if (process.argv.length<3) {
 const password = process.argv[2]
 
 const url =
-  `mongodb+srv://fullstack:${password}@cluster0.o1opl.mongodb.net/?retryWrites=true&w=majority`
+  `mongodb+srv://Fullstack:${password}@fullstackopen.yvhkeuh.mongodb.net/?retryWrites=true&w=majority`
 
 mongoose.set('strictQuery',false)
 mongoose.connect(url)
 
 const blogSchema = new mongoose.Schema({
-
   title: String,
   author: String,
   url: String,
@@ -30,16 +29,14 @@ const blog = new Blog({
   likes: 100
 })
 
-/*
 blog.save().then(result => {
   console.log('blog saved!')
   mongoose.connection.close()
 })
-*/
 
-Blog.find({}).then(result => {
-  result.forEach(blog => {
-    console.log(blog)
-  })
-  mongoose.connection.close()
-})
+// Blog.find({}).then(result => {
+//   result.forEach(blog => {
+//     console.log(blog)
+//   })
+//   mongoose.connection.close()
+// })
