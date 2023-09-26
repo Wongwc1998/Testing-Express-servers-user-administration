@@ -13,30 +13,30 @@ const url =
 mongoose.set('strictQuery',false)
 mongoose.connect(url)
 
-const noteSchema = new mongoose.Schema({
+const blogSchema = new mongoose.Schema({
   content: String,
   date: Date,
   important: Boolean,
 })
 
-const Note = mongoose.model('Note', noteSchema)
+const Blog = mongoose.model('Blog', blogSchema)
 
-const note = new Note({
+const blog = new Blog({
   content: 'Mongoose makes things easy',
   date: new Date(),
   important: true,
 })
 
 /*
-note.save().then(result => {
-  console.log('note saved!')
+blog.save().then(result => {
+  console.log('blog saved!')
   mongoose.connection.close()
 })
 */
 
-Note.find({}).then(result => {
-  result.forEach(note => {
-    console.log(note)
+Blog.find({}).then(result => {
+  result.forEach(blog => {
+    console.log(blog)
   })
   mongoose.connection.close()
 })

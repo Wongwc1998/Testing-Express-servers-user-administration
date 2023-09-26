@@ -1,17 +1,17 @@
-const notesRouter = require('express').Router()
+const blogsRouter = require('express').Router()
 const Blog = require('../models/blog')
 
-notesRouter.get('/', (request, response) => {
-  Blog.find({}).then(notes => {
-    response.json(notes)
+blogsRouter.get('/', (request, response) => {
+  Blog.find({}).then(blogs => {
+    response.json(blogs)
   })
 })
 
-notesRouter.get('/:id', (request, response, next) => {
+blogsRouter.get('/:id', (request, response, next) => {
   Blog.findById(request.params.id)
-    .then(note => {
-      if (note) {
-        response.json(note)
+    .then(blog => {
+      if (blog) {
+        response.json(blog)
       } else {
         response.status(404).end()
       }
@@ -19,23 +19,23 @@ notesRouter.get('/:id', (request, response, next) => {
     .catch(error => next(error))
 })
 
-notesRouter.post('/', (request, response, next) => {
+blogsRouter.post('/', (request, response, next) => {
   const body = request.body
 
-  const note = new Blog({
+  const blog = new Blog({
     content: body.content,
     important: body.important || false,
     date: new Date()
   })
 
-  note.save()
+  blog.save()
     .then(savedBlog => {
       response.json(savedBlog)
     })
     .catch(error => next(error))
 })
 
-notesRouter.delete('/:id', (request, response, next) => {
+blogsRouter.delete('/:id', (request, response, next) => {
   Blog.findByIdAndRemove(request.params.id)
     .then(() => {
       response.status(204).end()
@@ -43,19 +43,19 @@ notesRouter.delete('/:id', (request, response, next) => {
     .catch(error => next(error))
 })
 
-notesRouter.put('/:id', (request, response, next) => {
+blogsRouter.put('/:id', (request, response, next) => {
   const body = request.body
 
-  const note = {
+  const blog = {
     content: body.content,
     important: body.important,
   }
 
-  Blog.findByIdAndUpdate(request.params.id, note, { new: true })
+  Blog.findByIdAndUpdate(request.params.id, blog, { new: true })
     .then(updatedBlog => {
       response.json(updatedBlog)
     })
     .catch(error => next(error))
 })
 
-module.exports = notesRouter
+module.exports = blogsRouter
