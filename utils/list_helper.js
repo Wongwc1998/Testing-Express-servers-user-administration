@@ -16,7 +16,6 @@ const mostBlogs = (blogs) => {
         _.groupBy(blogs, 'author'), 
         (authorBlogs, author) => ({ author: author, blogs: authorBlogs.length })
     );
-    console.log(authorsWithCount);
 
     return _.maxBy(authorsWithCount, 'blogs');
 }
