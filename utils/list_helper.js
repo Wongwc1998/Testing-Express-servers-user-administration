@@ -7,7 +7,7 @@ const totalLikes = (blogs) => {
 }
 
 const favoriteBlog = (blogs) => {
-    return 0
+    return blogs.reduce((a, obj) => a.likes > obj.likes ? a : obj)
 }
 
 const mostBlogs = (blogs) => {
