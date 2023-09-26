@@ -2,6 +2,8 @@ POST http://localhost:3001/api/blogs
 Content-Type: application/json
 
 {
-  "content": "Ensure that everything still works",
-  "important": true
+  "title": "String",
+  "author": "String",
+  "url": "String",
+  "likes": 1
 }

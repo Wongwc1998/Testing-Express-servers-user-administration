@@ -14,17 +14,20 @@ mongoose.set('strictQuery',false)
 mongoose.connect(url)
 
 const blogSchema = new mongoose.Schema({
-  content: String,
-  date: Date,
-  important: Boolean,
+
+  title: String,
+  author: String,
+  url: String,
+  likes: Number
 })
 
 const Blog = mongoose.model('Blog', blogSchema)
 
 const blog = new Blog({
-  content: 'Mongoose makes things easy',
-  date: new Date(),
-  important: true,
+  title: 'The Art of War',
+  author: 'Sun Tzu',
+  url: 'https://en.wikipedia.org/wiki/The_Art_of_War',
+  likes: 100
 })
 
 /*
