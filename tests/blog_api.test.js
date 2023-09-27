@@ -29,7 +29,6 @@ test('a specific blog is within the returned blogs', async () => {
   const response = await api.get('/api/blogs')
 
   const titles = response.body.map(r => r.title)
-  console.log(titles)
 
   expect(titles).toContain(
     'React patterns'
@@ -83,6 +82,17 @@ test('blog default likes is 0 ', async () => {
   const likes = blogsAtEnd[0].likes
   expect(likes).toBe(0)
 })
+
+test('the unique identifier property of the blog posts is named _id', async () => {
+  const response = await api.get('/api/blogs')
+  console.log(response.body)
+  const ids = response.body.map(r => r.id)
+  console.log(ids)
+    ids.forEach(id => {
+    expect(id).toBeDefined()
+  });
+})
+
 
 test('blog without title is not added', async () => {
   const newBlog = {
