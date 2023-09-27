@@ -183,6 +183,19 @@ test('a blog can be updated', async () => {
   expect(titles).toContain(UpdatedBlog.title)
 })
 
+test('each blog contains information on the creator of the blog', async () => {
+  const blogsAtStart = await helper.blogsInDb()
+  const blogToView = blogsAtStart[0]
+  console.log(blogToView)
+
+  const resultBlog = await api
+    .get(`/api/blogs/${blogToView.id}`)
+    .expect(200)
+    .expect('Content-Type', /application\/json/)
+
+  expect(resultBlog.body.user).toBeDefined()
+})
+
 afterAll(async () => {
   await mongoose.connection.close()
 })
