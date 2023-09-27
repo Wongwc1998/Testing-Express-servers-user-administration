@@ -94,15 +94,24 @@ test('the unique identifier property of the blog posts is named _id', async () =
 })
 
 
-test('blog without title is not added', async () => {
-  const newBlog = {
+test('blog without title or url is not added', async () => {
+  const newBlogWithoutTitle = {
     author: "Robert C. Martin",
     url: "http://blog.cleancoder.com/uncle-bob/2016/05/01/TypeWars.html",
+  }
+  const newBlogWithoutUrl = {
+    title: "Type wars",
+    author: "Robert C. Martin",
   }
 
   await api
     .post('/api/blogs')
-    .send(newBlog)
+    .send(newBlogWithoutTitle)
+    .expect(400)
+
+  await api
+    .post('/api/blogs')
+    .send(newBlogWithoutUrl)
     .expect(400)
 
   const blogsAtEnd = await helper.blogsInDb()
