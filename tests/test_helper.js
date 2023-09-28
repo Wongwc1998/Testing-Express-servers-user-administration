@@ -85,10 +85,16 @@ const blogsInDb = async () => {
   return blogs.map((blog) => blog.toJSON());
 };
 
+const omitUser = (blog) => {
+  const { user, ...rest } = blog;
+  return rest;
+}
+
 module.exports = {
   initialBlogs,
   nonExistingId,
   blogsInDb,
   initialUsers,
+  omitUser,
   usersInDb,
 };

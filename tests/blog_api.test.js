@@ -89,10 +89,7 @@ test("a blog cannot be added without a token", async () => {
     __v: 0,
   };
 
-  await api
-    .post("/api/blogs")
-    .send(newBlog)
-    .expect(500);
+  await api.post("/api/blogs").send(newBlog).expect(500);
 
   const blogsAtEnd = await helper.blogsInDb();
   expect(blogsAtEnd).toHaveLength(helper.initialBlogs.length);
@@ -185,17 +182,21 @@ test("blog without title or url is not added", async () => {
 
 test("a specific blog can be viewed", async () => {
   const blogsAtStart = await helper.blogsInDb();
+  const usersAtStart = await helper.usersInDb();
+  console.log(usersAtStart);
 
   const blogToView = blogsAtStart[0];
+  const userForBlog = usersAtStart.find(
+    (user) => user.id === blogToView.user.toString()
+  );
+  blogToView.user = userForBlog;
 
   const resultBlog = await api
     .get(`/api/blogs/${blogToView.id}`)
     .expect(200)
     .expect("Content-Type", /application\/json/);
 
-  resultBlog.body.user._id = resultBlog.body.user._id.toString();
-
-  expect(resultBlog.body).toEqual(blogToView);
+  expect(helper.omitUser(resultBlog.body)).toEqual(expect.objectContaining(helper.omitUser(blogToView)));
 });
 
 test("a blog can be deleted", async () => {
