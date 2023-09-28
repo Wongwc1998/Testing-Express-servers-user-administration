@@ -11,14 +11,14 @@ const helper = require("./test_helper");
 
 beforeEach(async () => {
   await Blog.deleteMany({});
-  await User.deleteMany({});  // clearing all the users
+  await User.deleteMany({}); // clearing all the users
 
-  const userObjects = helper.initialUsers.map(user => new User(user));
-  const promiseArrayUsers = userObjects.map(user => user.save());
+  const userObjects = helper.initialUsers.map((user) => new User(user));
+  const promiseArrayUsers = userObjects.map((user) => user.save());
   await Promise.all(promiseArrayUsers);
 
-  const blogObjects = helper.initialBlogs.map(blog => new Blog(blog));
-  const promiseArrayBlogs = blogObjects.map(blog => blog.save());
+  const blogObjects = helper.initialBlogs.map((blog) => new Blog(blog));
+  const promiseArrayBlogs = blogObjects.map((blog) => blog.save());
   await Promise.all(promiseArrayBlogs);
 }, 30000);
 
@@ -143,7 +143,7 @@ test("a specific blog can be viewed", async () => {
     .expect(200)
     .expect("Content-Type", /application\/json/);
 
-  //const processedBlogToView = JSON.parse(JSON.stringify(blogToView))
+  resultBlog.body.user._id = resultBlog.body.user._id.toString();
 
   expect(resultBlog.body).toEqual(blogToView);
 });
