@@ -1,15 +1,25 @@
 const mongoose = require("mongoose");
 const supertest = require("supertest");
 const app = require("../app");
+const jwt = require("jsonwebtoken");
 
 const api = supertest(app);
 
 const Blog = require("../models/blog");
+const User = require("../models/user");
 const helper = require("./test_helper");
 
 beforeEach(async () => {
   await Blog.deleteMany({});
-  await Blog.insertMany(helper.initialBlogs);
+  await User.deleteMany({});  // clearing all the users
+
+  const userObjects = helper.initialUsers.map(user => new User(user));
+  const promiseArrayUsers = userObjects.map(user => user.save());
+  await Promise.all(promiseArrayUsers);
+
+  const blogObjects = helper.initialBlogs.map(blog => new Blog(blog));
+  const promiseArrayBlogs = blogObjects.map(blog => blog.save());
+  await Promise.all(promiseArrayBlogs);
 }, 30000);
 
 test("blogs are returned as json", async () => {
@@ -34,6 +44,21 @@ test("a specific blog is within the returned blogs", async () => {
 });
 
 test("a valid blog can be added ", async () => {
+  // Fetch user MichaelChan from the database
+  const user = await User.findOne({ username: "MichaelChan" });
+
+  // Ensure user exists
+  if (!user) {
+    throw new Error("User MichaelChan not found in database");
+  }
+
+  // Create token using user details
+  const userForToken = {
+    username: user.username,
+    id: user.id,
+  };
+  const token = jwt.sign(userForToken, process.env.SECRET, { expiresIn: 60*60 });
+
   const newBlog = {
     _id: "5a422bc61b54a676234d17fc",
     title: "Type wars",
@@ -45,6 +70,7 @@ test("a valid blog can be added ", async () => {
 
   await api
     .post("/api/blogs")
+    .set('Authorization', `Bearer ${token}`)
     .send(newBlog)
     .expect(201)
     .expect("Content-Type", /application\/json/);
