@@ -37,7 +37,7 @@ test("a valid user can be added ", async () => {
   const newUser = {
     username: "Johndoe",
     name: "John Doe",
-    passwordHash: "hashed_password_1",
+    password: "password",
   };
 
   await api
@@ -57,12 +57,12 @@ test("user with username or password lesser than 3 characters is not added", asy
   const newUserWithShortUsername = {
     username: "Jo",
     name: "John Doe",
-    passwordHash: "hashed_password_1",
+    password: "password",
   };
   const newUserWithShortPassword = {
     username: "Johndoe",
     name: "John Doe",
-    passwordHash: "ha",
+    password: "ha",
   };
 
   await api
