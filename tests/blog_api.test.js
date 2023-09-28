@@ -44,20 +44,17 @@ test("a specific blog is within the returned blogs", async () => {
 });
 
 test("a valid blog can be added ", async () => {
-  // Fetch user MichaelChan from the database
   const user = await User.findOne({ username: "MichaelChan" });
-
-  // Ensure user exists
   if (!user) {
     throw new Error("User MichaelChan not found in database");
   }
-
-  // Create token using user details
   const userForToken = {
     username: user.username,
     id: user.id,
   };
-  const token = jwt.sign(userForToken, process.env.SECRET, { expiresIn: 60*60 });
+  const token = jwt.sign(userForToken, process.env.SECRET, {
+    expiresIn: 60 * 60,
+  });
 
   const newBlog = {
     _id: "5a422bc61b54a676234d17fc",
@@ -70,7 +67,7 @@ test("a valid blog can be added ", async () => {
 
   await api
     .post("/api/blogs")
-    .set('Authorization', `Bearer ${token}`)
+    .set("Authorization", `Bearer ${token}`)
     .send(newBlog)
     .expect(201)
     .expect("Content-Type", /application\/json/);
@@ -82,7 +79,40 @@ test("a valid blog can be added ", async () => {
   expect(titles).toContain("Type wars");
 });
 
+test("a blog cannot be added without a token", async () => {
+  const newBlog = {
+    _id: "5a422bc61b54a676234d17fc",
+    title: "Type wars",
+    author: "Robert C. Martin",
+    url: "http://blog.cleancoder.com/uncle-bob/2016/05/01/TypeWars.html",
+    likes: 2,
+    __v: 0,
+  };
+
+  await api
+    .post("/api/blogs")
+    .send(newBlog)
+    .expect(500);
+
+  const blogsAtEnd = await helper.blogsInDb();
+  expect(blogsAtEnd).toHaveLength(helper.initialBlogs.length);
+
+  const titles = blogsAtEnd.map((n) => n.title);
+  expect(titles).not.toContain("Type wars");
+});
+
 test("blog default likes is 0 ", async () => {
+  const user = await User.findOne({ username: "MichaelChan" });
+  if (!user) {
+    throw new Error("User MichaelChan not found in database");
+  }
+  const userForToken = {
+    username: user.username,
+    id: user.id,
+  };
+  const token = jwt.sign(userForToken, process.env.SECRET, {
+    expiresIn: 60 * 60,
+  });
   await Blog.deleteMany({});
   const newBlogWithoutLikes = {
     _id: "5a422bc61b54a676234d17fc",
@@ -94,6 +124,7 @@ test("blog default likes is 0 ", async () => {
 
   await api
     .post("/api/blogs")
+    .set("Authorization", `Bearer ${token}`)
     .send(newBlogWithoutLikes)
     .expect(201)
     .expect("Content-Type", /application\/json/);
@@ -115,6 +146,17 @@ test("the unique identifier property of the blog posts is named _id", async () =
 });
 
 test("blog without title or url is not added", async () => {
+  const user = await User.findOne({ username: "MichaelChan" });
+  if (!user) {
+    throw new Error("User MichaelChan not found in database");
+  }
+  const userForToken = {
+    username: user.username,
+    id: user.id,
+  };
+  const token = jwt.sign(userForToken, process.env.SECRET, {
+    expiresIn: 60 * 60,
+  });
   const newBlogWithoutTitle = {
     author: "Robert C. Martin",
     url: "http://blog.cleancoder.com/uncle-bob/2016/05/01/TypeWars.html",
@@ -124,9 +166,17 @@ test("blog without title or url is not added", async () => {
     author: "Robert C. Martin",
   };
 
-  await api.post("/api/blogs").send(newBlogWithoutTitle).expect(400);
+  await api
+    .post("/api/blogs")
+    .set("Authorization", `Bearer ${token}`)
+    .send(newBlogWithoutTitle)
+    .expect(400);
 
-  await api.post("/api/blogs").send(newBlogWithoutUrl).expect(400);
+  await api
+    .post("/api/blogs")
+    .set("Authorization", `Bearer ${token}`)
+    .send(newBlogWithoutUrl)
+    .expect(400);
 
   const blogsAtEnd = await helper.blogsInDb();
 
