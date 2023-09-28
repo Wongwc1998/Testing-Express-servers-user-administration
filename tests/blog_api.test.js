@@ -199,11 +199,29 @@ test("a specific blog can be viewed", async () => {
   expect(helper.omitUser(resultBlog.body)).toEqual(expect.objectContaining(helper.omitUser(blogToView)));
 });
 
-test("a blog can be deleted", async () => {
+test("a blog can be deleted only by the user who added the blog", async () => {
+  const user = await User.findOne({ username: "MichaelChan" });
+  if (!user) {
+    throw new Error("User MichaelChan not found in database");
+  }
+  const userForToken = {
+    username: user.username,
+    id: user.id,
+  };
+  const token = jwt.sign(userForToken, process.env.SECRET, {
+    expiresIn: 60 * 60,
+  });
   const blogsAtStart = await helper.blogsInDb();
   const blogToDelete = blogsAtStart[0];
 
-  await api.delete(`/api/blogs/${blogToDelete.id}`).expect(204);
+  await api.
+  delete(`/api/blogs/${blogToDelete.id}`).
+  expect(401)
+
+  await api.
+  delete(`/api/blogs/${blogToDelete.id}`).
+  set("Authorization", `Bearer ${token}`).
+  expect(204);
 
   const blogsAtEnd = await helper.blogsInDb();
 
@@ -213,6 +231,33 @@ test("a blog can be deleted", async () => {
 
   expect(titles).not.toContain(blogToDelete.title);
 });
+
+test("a blog cannot be deleted by other users", async () => {
+  const user = await User.findOne({ username: "RobertCMartin" });
+  const userForToken = {
+    username: user.username,
+    id: user.id,
+  };
+  const token = jwt.sign(userForToken, process.env.SECRET, {
+    expiresIn: 60 * 60,
+  });
+  const blogsAtStart = await helper.blogsInDb();
+  const blogToDelete = blogsAtStart[0];
+
+  await api.
+  delete(`/api/blogs/${blogToDelete.id}`).
+  set("Authorization", `Bearer ${token}`).
+  expect(401)
+
+  const blogsAtEnd = await helper.blogsInDb();
+
+  expect(blogsAtEnd).toHaveLength(helper.initialBlogs.length);
+
+  const titles = blogsAtEnd.map((r) => r.title);
+
+  expect(titles).toContain(blogToDelete.title);
+});
+
 test("a blog can be updated", async () => {
   const blogsAtStart = await helper.blogsInDb();
   const UpdatedBlog = {
