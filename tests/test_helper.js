@@ -25,7 +25,6 @@ const initialBlogs = [
     title: "Canonical string reduction",
     author: "Edsger W. Dijkstra",
     user: "5d7f1b1b1c9d440000a1b0a2",
-
     url: "http://www.cs.utexas.edu/~EWD/transcriptions/EWD08xx/EWD808.html",
     likes: 12,
     __v: 0,
@@ -35,7 +34,6 @@ const initialBlogs = [
     title: "First class tests",
     author: "Robert C. Martin",
     user: "5d7f1b1b1c9d440000a1b0a3",
-
     url: "http://blog.cleancoder.com/uncle-bob/2017/05/05/TestDefinitions.htmll",
     likes: 10,
     __v: 0,
@@ -44,8 +42,7 @@ const initialBlogs = [
     _id: "5a422ba71b54a676234d17fb",
     title: "TDD harms architecture",
     author: "Robert C. Martin",
-    id: "5d7f1b1b1c9d440000a1b0a3",
-
+    user: "5d7f1b1b1c9d440000a1b0a3",
     url: "http://blog.cleancoder.com/uncle-bob/2017/03/03/TDD-Harms-Architecture.html",
     likes: 0,
     __v: 0,
