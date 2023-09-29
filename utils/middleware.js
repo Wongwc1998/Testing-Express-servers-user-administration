@@ -11,6 +11,7 @@ const requestLogger = (request, response, next) => {
 };
 
 const unknownEndpoint = (request, response) => {
+  logger.error("Unknown endpoint:", request.path);
   response.status(404).send({ error: "unknown endpoint" });
 };
 
@@ -57,7 +58,6 @@ const userExtractor = async (request, response, next) => {
           .json({ error: "Token associated user not found" });
       }
       request.user = user;
-      next();
     } catch (error) {
       logger.error("Error extracting user:", error);
       if (request.method !== "GET") {
@@ -70,7 +70,10 @@ const userExtractor = async (request, response, next) => {
     // Make token mandatory for non-GET requests
     return response.status(401).json({ error: "Token missing" });
   }
+  
+  next(); // Ensure to call next() at the end
 };
+
 
 module.exports = {
   requestLogger,

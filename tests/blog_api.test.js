@@ -89,7 +89,7 @@ test("a blog cannot be added without a token", async () => {
     __v: 0,
   };
 
-  await api.post("/api/blogs").send(newBlog).expect(500);
+  await api.post("/api/blogs").send(newBlog).expect(401);
 
   const blogsAtEnd = await helper.blogsInDb();
   expect(blogsAtEnd).toHaveLength(helper.initialBlogs.length);
