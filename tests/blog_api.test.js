@@ -11,7 +11,7 @@ const helper = require("./test_helper");
 
 beforeEach(async () => {
   await Blog.deleteMany({});
-  await User.deleteMany({}); // clearing all the users
+  await User.deleteMany({});
 
   const userObjects = helper.initialUsers.map((user) => new User(user));
   const promiseArrayUsers = userObjects.map((user) => user.save());
@@ -200,37 +200,44 @@ test("a specific blog can be viewed", async () => {
 });
 
 test("a blog can be deleted only by the user who added the blog", async () => {
-  const user = await User.findOne({ username: "MichaelChan" });
-  if (!user) {
-    throw new Error("User MichaelChan not found in database");
-  }
+  // Create and save a user
+  const newUser = new User({
+    username: "JohnDoe",
+    name: "John Doe",
+  });
+  const savedUser = await newUser.save();
+
+  // Create a blog using the saved user's id
+  const newBlog = new Blog({
+    title: "Test Blog",
+    author: "John Doe",
+    user: savedUser._id,
+    url: "Test Url",
+    likes: 7,
+  });
+  const savedBlog = await newBlog.save();
+
+  // Generate a JWT for the saved user
   const userForToken = {
-    username: user.username,
-    id: user.id,
+    username: savedUser.username,
+    id: savedUser._id,
   };
   const token = jwt.sign(userForToken, process.env.SECRET, {
     expiresIn: 60 * 60,
   });
-  const blogsAtStart = await helper.blogsInDb();
-  const blogToDelete = blogsAtStart[0];
 
-  await api.
-  delete(`/api/blogs/${blogToDelete.id}`).
-  expect(401)
+  // Delete the blog using the generated JWT
+  await api
+    .delete(`/api/blogs/${savedBlog._id}`)
+    .set("Authorization", `Bearer ${token}`)
+    .expect(204);
 
-  await api.
-  delete(`/api/blogs/${blogToDelete.id}`).
-  set("Authorization", `Bearer ${token}`).
-  expect(204);
-
+  // Verify the blog has been deleted
   const blogsAtEnd = await helper.blogsInDb();
-
-  expect(blogsAtEnd).toHaveLength(helper.initialBlogs.length - 1);
-
   const titles = blogsAtEnd.map((r) => r.title);
-
-  expect(titles).not.toContain(blogToDelete.title);
+  expect(titles).not.toContain(savedBlog.title);
 });
+
 
 test("a blog cannot be deleted by other users", async () => {
   const user = await User.findOne({ username: "RobertCMartin" });

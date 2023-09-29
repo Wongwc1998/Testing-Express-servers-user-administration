@@ -22,8 +22,7 @@ blogsRouter.get("/:id", async (request, response) => {
 blogsRouter.post("/", async (request, response) => {
   logger.info("Request to post a blog received.");
   const body = request.body;
-  const decodedToken = jwt.verify(request.token, process.env.SECRET)
-  const user = await User.findById(decodedToken.id);
+  const user = request.user
   logger.info({ user });
 
   const blog = new Blog({
@@ -43,8 +42,21 @@ blogsRouter.post("/", async (request, response) => {
 });
 
 blogsRouter.delete("/:id", async (request, response) => {
-  await Blog.findByIdAndRemove(request.params.id);
-  response.status(204).end();
+  //a blog can be deleted only by the user who added the blog
+  //get blog
+  const blog = await Blog.findById(request.params.id);
+  //get userid
+  const user = request.user
+  const userid = user._id
+  //compare userid with blog.user
+  if (blog.user.toString() === userid.toString()) {
+    await Blog.findByIdAndRemove(request.params.id);
+    response.status(204).end();
+  } else {
+    response.status(401).end();
+  }
+  // await Blog.findByIdAndRemove(request.params.id);
+  // response.status(204).end();
 });
 
 blogsRouter.put("/:id", async (request, response) => {
