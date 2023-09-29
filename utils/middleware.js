@@ -71,7 +71,7 @@ const userExtractor = async (request, response, next) => {
     return response.status(401).json({ error: "Token missing" });
   }
   
-  next(); // Ensure to call next() at the end
+  next();
 };
 
 

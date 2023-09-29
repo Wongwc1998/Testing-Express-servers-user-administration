@@ -265,7 +265,7 @@ test("a blog cannot be deleted by other users", async () => {
   expect(titles).toContain(blogToDelete.title);
 });
 
-test("a blog can be updated", async () => {
+test("a blog cannot be updated without a token", async () => {
   const blogsAtStart = await helper.blogsInDb();
   const UpdatedBlog = {
     _id: "1",
@@ -278,7 +278,7 @@ test("a blog can be updated", async () => {
   const blogToUpdate = blogsAtStart[0];
   console.log(blogToUpdate);
 
-  await api.put(`/api/blogs/${blogToUpdate.id}`).send(UpdatedBlog).expect(200);
+  await api.put(`/api/blogs/${blogToUpdate.id}`).send(UpdatedBlog).expect(401);
 
   const blogsAtEnd = await helper.blogsInDb();
   console.log(blogsAtEnd);
